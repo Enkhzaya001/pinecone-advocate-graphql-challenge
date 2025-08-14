@@ -89,16 +89,12 @@ export function TodoList() {
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
         Todo List
       </h2>
-
-      {/* Add todo input */}
       <AddTask refetch={refetch} />
-      {/* Update Dialog */}
       <UpdateDialog
         handleUpdateTask={handleUpdateTask}
         editText={editText}
         setEditText={setEditText}
       />
-      {/* Active Tasks */}
       <h2 className="text-2xl font-semibold mb-3 text-gray-700">
         Active Tasks
       </h2>
@@ -129,7 +125,6 @@ export function TodoList() {
           ))}
       </ul>
 
-      {/* Finished Tasks */}
       <h2 className="text-2xl font-semibold mt-6 mb-3 text-gray-700">
         Finished Tasks
       </h2>

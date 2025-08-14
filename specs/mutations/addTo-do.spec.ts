@@ -36,8 +36,77 @@ describe("addTodo", () => {
     expect(result).toEqual(mockTodo);
   });
 
+  it("should create a todo with empty title", async () => {
+    const mockTodo = {
+      id: "mocked-uuid",
+      title: "",
+      completed: false,
+    };
+
+    (TodoModel.create as jest.Mock).mockResolvedValue(mockTodo);
+
+    const result = await addTodo(null, { title: "" });
+
+    expect(TodoModel.create).toHaveBeenCalledWith({
+      id: "mocked-uuid",
+      title: "",
+      completed: false,
+    });
+    expect(result).toEqual(mockTodo);
+  });
+
+  it("should create a todo with very long title", async () => {
+    const longTitle = "A".repeat(1000);
+    const mockTodo = {
+      id: "mocked-uuid",
+      title: longTitle,
+      completed: false,
+    };
+
+    (TodoModel.create as jest.Mock).mockResolvedValue(mockTodo);
+
+    const result = await addTodo(null, { title: longTitle });
+
+    expect(TodoModel.create).toHaveBeenCalledWith({
+      id: "mocked-uuid",
+      title: longTitle,
+      completed: false,
+    });
+    expect(result).toEqual(mockTodo);
+  });
+
   it("should throw an error if creation fails", async () => {
     (TodoModel.create as jest.Mock).mockRejectedValue(new Error("DB Error"));
+
+    await expect(addTodo(null, { title: "Fail Task" })).rejects.toThrow(
+      "Failed to add todo"
+    );
+  });
+
+  it("should handle database connection errors", async () => {
+    (TodoModel.create as jest.Mock).mockRejectedValue(
+      new Error("Database connection failed")
+    );
+
+    await expect(addTodo(null, { title: "Fail Task" })).rejects.toThrow(
+      "Failed to add todo"
+    );
+  });
+
+  it("should handle validation errors", async () => {
+    (TodoModel.create as jest.Mock).mockRejectedValue(
+      new Error("Validation failed")
+    );
+
+    await expect(addTodo(null, { title: "Fail Task" })).rejects.toThrow(
+      "Failed to add todo"
+    );
+  });
+
+  it("should handle network timeout errors", async () => {
+    (TodoModel.create as jest.Mock).mockRejectedValue(
+      new Error("Network timeout")
+    );
 
     await expect(addTodo(null, { title: "Fail Task" })).rejects.toThrow(
       "Failed to add todo"

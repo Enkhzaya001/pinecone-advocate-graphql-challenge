@@ -24,11 +24,37 @@ describe("getTodo", () => {
     const result = await getTodo();
 
     expect(TodoModel.find).toHaveBeenCalledTimes(1);
+    expect(TodoModel.find).toHaveBeenCalledWith();
     expect(result).toEqual(mockTodos);
+  });
+
+  it("should return empty array when no todos exist", async () => {
+    (TodoModel.find as jest.Mock).mockResolvedValue([]);
+
+    const result = await getTodo();
+
+    expect(TodoModel.find).toHaveBeenCalledTimes(1);
+    expect(result).toEqual([]);
   });
 
   it("should throw an error if fetching fails", async () => {
     (TodoModel.find as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+    await expect(getTodo()).rejects.toThrow("Failed to fetch todos");
+  });
+
+  it("should handle database connection errors", async () => {
+    (TodoModel.find as jest.Mock).mockRejectedValue(
+      new Error("Database connection failed")
+    );
+
+    await expect(getTodo()).rejects.toThrow("Failed to fetch todos");
+  });
+
+  it("should handle network timeout errors", async () => {
+    (TodoModel.find as jest.Mock).mockRejectedValue(
+      new Error("Network timeout")
+    );
 
     await expect(getTodo()).rejects.toThrow("Failed to fetch todos");
   });
